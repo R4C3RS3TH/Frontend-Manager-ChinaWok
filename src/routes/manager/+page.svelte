@@ -1,4 +1,21 @@
 <script lang="ts">
+	import { onMount, onDestroy } from 'svelte';
+	import {
+		getWebSocketService,
+		wsStatus,
+		wsMessages,
+		wsMessageCount,
+		clearMessages,
+		type WebSocketMessage
+	} from '$lib';
+
+	// Obtener el servicio WebSocket
+	const wsService = getWebSocketService();
+
+	// Variables reactivas para el estado
+	let messageToSend = '';
+	let showWebSocketPanel = false;
+
 	const stats = [
 		{
 			title: 'Ventas del Día',
@@ -72,6 +89,77 @@
 				return 'bg-gray-100 text-gray-800';
 		}
 	}
+
+	// Funciones de WebSocket
+	function getStatusBadgeColor(status: string) {
+		switch (status) {
+			case 'connected':
+				return 'bg-green-500';
+			case 'connecting':
+				return 'bg-yellow-500 animate-pulse';
+			case 'disconnected':
+				return 'bg-gray-400';
+			case 'error':
+				return 'bg-red-500';
+			default:
+				return 'bg-gray-400';
+		}
+	}
+
+	function getStatusText(status: string) {
+		switch (status) {
+			case 'connected':
+				return 'Conectado';
+			case 'connecting':
+				return 'Conectando...';
+			case 'disconnected':
+				return 'Desconectado';
+			case 'error':
+				return 'Error';
+			default:
+				return status;
+		}
+	}
+
+	function handleSendMessage() {
+		if (!messageToSend.trim()) return;
+
+		const message: WebSocketMessage = {
+			type: 'message',
+			data: messageToSend,
+			timestamp: new Date().toISOString()
+		};
+
+		const success = wsService.send(message);
+		if (success) {
+			messageToSend = '';
+		}
+	}
+
+	function handleConnect() {
+		wsService.connect();
+	}
+
+	function handleDisconnect() {
+		wsService.disconnect();
+	}
+
+	function handleClearMessages() {
+		clearMessages();
+	}
+
+	// Lifecycle hooks
+	onMount(() => {
+		// Conectar automáticamente al montar el componente
+		console.log('🎯 Componente montado - Conectando WebSocket...');
+		wsService.connect();
+	});
+
+	onDestroy(() => {
+		// Desconectar al desmontar el componente
+		console.log('🎯 Componente desmontado - Desconectando WebSocket...');
+		wsService.disconnect();
+	});
 </script>
 
 <div class="space-y-6">
@@ -80,7 +168,187 @@
 			<h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
 			<p class="text-gray-500">Bienvenido de nuevo, Manager.</p>
 		</div>
+
+		<!-- WebSocket Status Indicator - Enhanced & Always Visible -->
+		<div class="flex items-center gap-3">
+			<button
+				on:click={() => (showWebSocketPanel = !showWebSocketPanel)}
+				class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium text-gray-700 flex items-center gap-2"
+			>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M13 10V3L4 14h7v7l9-11h-7z"
+					/>
+				</svg>
+				{showWebSocketPanel ? 'Ocultar' : 'Mostrar'} Panel WS
+			</button>
+
+			<!-- Enhanced Status Badge with Gradient & Animations -->
+			<div
+				class="flex items-center gap-3 px-4 py-2.5 rounded-lg shadow-md border-2 transition-all duration-300"
+				class:border-green-400={$wsStatus === 'connected'}
+				class:bg-gradient-to-r={$wsStatus === 'connected'}
+				class:from-green-50={$wsStatus === 'connected'}
+				class:to-emerald-50={$wsStatus === 'connected'}
+				class:border-yellow-400={$wsStatus === 'connecting'}
+				class:bg-yellow-50={$wsStatus === 'connecting'}
+				class:border-gray-300={$wsStatus === 'disconnected'}
+				class:bg-gray-50={$wsStatus === 'disconnected'}
+				class:border-red-400={$wsStatus === 'error'}
+				class:bg-red-50={$wsStatus === 'error'}
+			>
+				<!-- Status Icon with Pulse Animation -->
+				<div class="relative flex items-center justify-center">
+					<span class="w-3 h-3 rounded-full {getStatusBadgeColor($wsStatus)}"></span>
+					{#if $wsStatus === 'connected'}
+						<span class="absolute w-3 h-3 rounded-full bg-green-400 animate-ping opacity-75"></span>
+					{/if}
+				</div>
+
+				<!-- Status Text with Details -->
+				<div class="flex flex-col">
+					<span class="text-sm font-bold text-gray-800">{getStatusText($wsStatus)}</span>
+					{#if $wsStatus === 'connected'}
+						<span class="text-xs text-green-600 font-medium">⚡ En tiempo real</span>
+					{:else if $wsStatus === 'connecting'}
+						<span class="text-xs text-yellow-600">Estableciendo conexión...</span>
+					{:else if $wsStatus === 'error'}
+						<span class="text-xs text-red-600">Error de conexión</span>
+					{:else}
+						<span class="text-xs text-gray-500">Sin conexión activa</span>
+					{/if}
+				</div>
+
+				<!-- Message Counter with Icon -->
+				{#if $wsMessageCount > 0}
+					<div class="ml-2 flex items-center gap-1">
+						<svg
+							class="w-4 h-4 text-blue-600"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+							/>
+						</svg>
+						<span class="px-2 py-0.5 bg-blue-600 text-white text-xs font-bold rounded-full">
+							{$wsMessageCount}
+						</span>
+					</div>
+				{/if}
+			</div>
+		</div>
 	</header>
+
+	<!-- WebSocket Control Panel (Collapsible) -->
+	{#if showWebSocketPanel}
+		<div
+			class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-200 p-6 shadow-md"
+		>
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+					<svg
+						class="w-5 h-5 text-indigo-600"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M13 10V3L4 14h7v7l9-11h-7z"
+						/>
+					</svg>
+					Panel de WebSocket
+				</h2>
+				<div class="flex gap-2">
+					{#if $wsStatus === 'disconnected' || $wsStatus === 'error'}
+						<button
+							on:click={handleConnect}
+							class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
+						>
+							Conectar
+						</button>
+					{:else}
+						<button
+							on:click={handleDisconnect}
+							class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors"
+						>
+							Desconectar
+						</button>
+					{/if}
+					<button
+						on:click={handleClearMessages}
+						class="px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors"
+					>
+						Limpiar
+					</button>
+				</div>
+			</div>
+
+			<!-- Send Message Section -->
+			<div class="bg-white rounded-lg p-4 mb-4 border border-gray-200">
+				<h3 class="text-sm font-semibold text-gray-700 mb-2">Enviar Mensaje</h3>
+				<div class="flex gap-2">
+					<input
+						type="text"
+						bind:value={messageToSend}
+						on:keypress={(e) => e.key === 'Enter' && handleSendMessage()}
+						placeholder="Escribe un mensaje..."
+						class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+						disabled={$wsStatus !== 'connected'}
+					/>
+					<button
+						on:click={handleSendMessage}
+						disabled={$wsStatus !== 'connected' || !messageToSend.trim()}
+						class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+					>
+						Enviar
+					</button>
+				</div>
+			</div>
+
+			<!-- Messages Display -->
+			<div class="bg-white rounded-lg p-4 border border-gray-200">
+				<h3 class="text-sm font-semibold text-gray-700 mb-2">
+					Mensajes Recibidos ({$wsMessageCount})
+				</h3>
+				<div class="max-h-64 overflow-y-auto space-y-2">
+					{#if $wsMessages.length === 0}
+						<p class="text-sm text-gray-400 italic text-center py-4">
+							No hay mensajes aún. Conecta y envía un mensaje de prueba.
+						</p>
+					{:else}
+						{#each $wsMessages as message, i}
+							<div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
+								<div class="flex justify-between items-start mb-1">
+									<span class="text-xs font-semibold text-indigo-600">
+										Mensaje #{i + 1}
+									</span>
+									{#if message.timestamp}
+										<span class="text-xs text-gray-400">
+											{new Date(message.timestamp).toLocaleTimeString()}
+										</span>
+									{/if}
+								</div>
+								<p class="text-sm text-gray-700 break-words">
+									{typeof message.data === 'string' ? message.data : JSON.stringify(message.data)}
+								</p>
+							</div>
+						{/each}
+					{/if}
+				</div>
+			</div>
+		</div>
+	{/if}
 
 	<!-- Stats Grid -->
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
