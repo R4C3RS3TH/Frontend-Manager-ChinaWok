@@ -19,6 +19,12 @@ let wsService: WebSocketService | null = null;
 /**
  * Obtener o crear la instancia del servicio WebSocket
  */
+import { goto } from '$app/navigation';
+import { toasts } from './toast.store';
+import type { ClientPayload } from '$lib/types/notification';
+
+// ... (imports remain the same)
+
 export function getWebSocketService(): WebSocketService {
     if (!wsService) {
         wsService = new WebSocketService();
@@ -32,6 +38,29 @@ export function getWebSocketService(): WebSocketService {
             wsLastMessage.set(message);
             wsMessages.update((messages) => [...messages, message]);
             wsMessageCount.update((count) => count + 1);
+
+            // Manejar notificaciones del backend
+            if (message.type === 'NOTIFICATION' && message.data) {
+                const payload = message.data as ClientPayload;
+
+                // 1. Manejar Acciones de UI
+                if (payload.ui) {
+                    switch (payload.ui.action) {
+                        case 'SHOW_TOAST':
+                            toasts.add(
+                                payload.ui.message,
+                                payload.ui.variant || 'INFO'
+                            );
+                            break;
+
+                        case 'REDIRECT':
+                            if (payload.data?.redirectUrl) {
+                                goto(payload.data.redirectUrl);
+                            }
+                            break;
+                    }
+                }
+            }
         });
 
         wsService.onError((error) => {
