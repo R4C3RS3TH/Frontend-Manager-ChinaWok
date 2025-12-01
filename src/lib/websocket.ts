@@ -3,9 +3,18 @@ import { PUBLIC_WEBSOCKET_URL } from '$env/static/public';
 export type WebSocketStatus = 'connected' | 'disconnected' | 'connecting' | 'error';
 
 export interface WebSocketMessage {
-    type: string;
+    action?: string;
     data: any;
     timestamp?: string;
+    ui?: {
+        action: string;
+        target: string;
+        variant: string;
+        message: string;
+    };
+    meta?: {
+        scope: string;
+    };
 }
 
 export class WebSocketService {
@@ -55,7 +64,7 @@ export class WebSocketService {
                 } catch (error) {
                     // Si no es JSON, manejar como texto plano
                     const message: WebSocketMessage = {
-                        type: 'text',
+                        action: 'text',
                         data: event.data,
                         timestamp: new Date().toISOString()
                     };

@@ -1,10 +1,16 @@
 <script lang="ts">
 	import { fade, fly } from 'svelte/transition';
+	import { onMount, onDestroy } from 'svelte';
+	import { wsMessages, getWebSocketService, wsStatus } from '$lib';
+
+	// WebSocket Service
+	const wsService = getWebSocketService();
+	let hasRequestedInventory = false;
 
 	// Mock data for menu items
-	let products = [
+	let products: any[] = [
 		{
-			id: 1,
+			id: '1',
 			name: 'Chaufa de Pollo',
 			description: 'Arroz chaufa con trozos de pollo y verduras.',
 			price: 18.0,
@@ -14,7 +20,7 @@
 			image: '/chaufa_de_pollo.png'
 		},
 		{
-			id: 2,
+			id: '2',
 			name: 'Sopa Wantan',
 			description: 'Sopa tradicional con wantan relleno de cerdo.',
 			price: 12.0,
@@ -24,7 +30,7 @@
 			image: '/sopa_wantan.png'
 		},
 		{
-			id: 3,
+			id: '3',
 			name: 'Chi Jau Kay',
 			description: 'Pollo rebozado con salsa de ostión y sésamo.',
 			price: 24.0,
@@ -34,7 +40,7 @@
 			image: '/chijaukay.png'
 		},
 		{
-			id: 4,
+			id: '4',
 			name: 'Inka Kola 1.5L',
 			description: 'Bebida gaseosa sabor nacional.',
 			price: 8.0,
@@ -44,7 +50,7 @@
 			image: '/inkacola.png'
 		},
 		{
-			id: 5,
+			id: '5',
 			name: 'Wantan Frito',
 			description: '6 unidades de wantan frito con salsa de tamarindo.',
 			price: 10.0,
@@ -54,6 +60,55 @@
 			image: '/wantan_frito.png'
 		}
 	];
+
+	// Lifecycle hooks
+	onMount(() => {
+		console.log('🍽️ Menú montado - Conectando WebSocket...');
+		wsService.connect();
+	});
+
+	onDestroy(() => {
+		console.log('🍽️ Menú desmontado - Desconectando WebSocket...');
+		wsService.disconnect();
+	});
+
+	// Reactive statements
+	$: {
+		// Send inventory request when connected
+		if ($wsStatus === 'connected' && !hasRequestedInventory) {
+			console.log('📤 Solicitando inventario al backend...');
+			wsService.send({
+				action: 'Productos.Listar',
+				data: { productType: 'PLATO' }
+			});
+			hasRequestedInventory = true;
+		}
+	}
+
+	// Subscribe to WebSocket messages
+	$: {
+		if ($wsMessages.length > 0) {
+			const lastMessage = $wsMessages[$wsMessages.length - 1];
+
+			// Handle incoming messages here
+			// Handle incoming messages here
+			if (lastMessage.ui?.action === 'HYDRATE' && lastMessage.ui?.target === 'products_store') {
+				console.log('📦 Inventario recibido:', lastMessage.data);
+				if (lastMessage.data?.products) {
+					products = lastMessage.data.products.map((p: any) => ({
+						id: p.producto_id?.S || '',
+						name: p.name?.S || '',
+						description: p.description?.S || '',
+						price: parseFloat(p.price?.N || '0'),
+						category: p.tipo_id?.S || 'General',
+						stock: parseInt(p.stock?.N || '0'),
+						active: true,
+						image: p.img?.S || ''
+					}));
+				}
+			}
+		}
+	}
 
 	let isModalOpen = false;
 	let editingProduct: any = null;

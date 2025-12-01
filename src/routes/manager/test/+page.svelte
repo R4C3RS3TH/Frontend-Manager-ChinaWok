@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
+	import { PUBLIC_WEBSOCKET_URL } from '$env/static/public';
 
 	let ws: WebSocket | null = null;
 	let status: 'disconnected' | 'connecting' | 'connected' | 'error' = 'disconnected';
 	let messages: string[] = [];
-	let websocketUrl = 'wss://nnpa36kkkd.execute-api.us-east-1.amazonaws.com/test/';
+	let websocketUrl = PUBLIC_WEBSOCKET_URL;
 	let messageToSend = '';
 	let logs: string[] = [];
 
