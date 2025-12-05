@@ -22,7 +22,7 @@
 		},
 		{
 			title: 'Clientes Nuevos',
-			value: '45',
+			value: '25',
 			change: '+5',
 			icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
 			color: 'bg-purple-100 text-purple-600'
@@ -33,49 +33,117 @@
 		{
 			id: '#CW-2023',
 			customer: 'Juan Perez',
-			items: '2x Aeropuerto, 1x Wantan',
-			total: 'S/ 45.00',
+			items: '2x Chijaukay, 1x Arroz Chaufa de Pollo',
+			total: 'S/ 69.70',
 			status: 'Preparando',
 			time: 'Hace 5 min'
 		},
 		{
 			id: '#CW-2022',
 			customer: 'Maria Garcia',
-			items: '1x Chi Jau Kay, 1x Inka Kola',
-			total: 'S/ 28.00',
-			status: 'Listo',
-			time: 'Hace 12 min'
+			items: '3x Alitas BBQ x12, 2x Tallarín Saltado con Pollo',
+			total: 'S/ 118.50',
+			status: 'Preparando',
+			time: 'Hace 8 min'
 		},
 		{
 			id: '#CW-2021',
 			customer: 'Carlos Lopez',
-			items: '3x Chaufa de Pollo',
-			total: 'S/ 54.00',
-			status: 'Entregado',
-			time: 'Hace 25 min'
+			items: '2x Tipakay, 2x Tallarín Taypá',
+			total: 'S/ 95.60',
+			status: 'Preparando',
+			time: 'Hace 12 min'
 		},
 		{
 			id: '#CW-2020',
 			customer: 'Ana Martinez',
-			items: '1x Tallarin Saltado',
-			total: 'S/ 22.00',
+			items: '4x Arroz Chaufa de Pollo, 1x Alitas BBQ x6',
+			total: 'S/ 106.50',
+			status: 'Listo',
+			time: 'Hace 18 min'
+		},
+		{
+			id: '#CW-2019',
+			customer: 'Roberto Silva',
+			items: '3x Alitas BBQ x6, 2x Chijaukay',
+			total: 'S/ 130.50',
+			status: 'Listo',
+			time: 'Hace 25 min'
+		},
+		{
+			id: '#CW-2018',
+			customer: 'Laura Gomez',
+			items: '2x Tallarín Saltado con Pollo, 2x Tipakay',
+			total: 'S/ 93.60',
+			status: 'En camino',
+			time: 'Hace 35 min'
+		},
+		{
+			id: '#CW-2017',
+			customer: 'Diego Ramirez',
+			items: '3x Arroz Chaufa de Pollo, 2x Alitas BBQ x12',
+			total: 'S/ 109.50',
+			status: 'Entregado',
+			time: 'Hace 42 min'
+		},
+		{
+			id: '#CW-2016',
+			customer: 'Sofia Torres',
+			items: '3x Tallarín Taypá, 1x Chijaukay',
+			total: 'S/ 93.60',
+			status: 'Entregado',
+			time: 'Hace 55 min'
+		},
+		{
+			id: '#CW-2015',
+			customer: 'Miguel Vargas',
+			items: '2x Chijaukay, 3x Alitas BBQ x6',
+			total: 'S/ 130.50',
+			status: 'Entregado',
+			time: 'Hace 1 hora'
+		},
+		{
+			id: '#CW-2014',
+			customer: 'Patricia Flores',
+			items: '2x Tipakay, 3x Arroz Chaufa de Pollo',
+			total: 'S/ 109.50',
+			status: 'Entregado',
+			time: 'Hace 1 hora'
+		},
+		{
+			id: '#CW-2013',
+			customer: 'Fernando Castro',
+			items: '4x Tallarín Saltado con Pollo, 1x Alitas BBQ x12',
+			total: 'S/ 112.50',
+			status: 'Entregado',
+			time: 'Hace 1 hora'
+		},
+		{
+			id: '#CW-2012',
+			customer: 'Claudia Mendez',
+			items: '2x Alitas BBQ x12, 1x Tallarín Taypá',
+			total: 'S/ 72.70',
 			status: 'Cancelado',
-			time: 'Hace 40 min'
+			time: 'Hace 1 hora'
 		}
 	];
 
 	function getStatusColor(status: string) {
 		switch (status) {
+			case 'Pendiente':
+				return 'bg-gray-100 text-gray-800 border-gray-200';
 			case 'Preparando':
-				return 'bg-yellow-100 text-yellow-800';
+				return 'bg-yellow-100 text-yellow-800 border-yellow-200';
 			case 'Listo':
-				return 'bg-green-100 text-green-800';
+				return 'bg-orange-100 text-orange-800 border-orange-200';
+			case 'En camino':
+				return 'bg-blue-100 text-blue-800 border-blue-200';
 			case 'Entregado':
-				return 'bg-blue-100 text-blue-800';
+				return 'bg-green-100 text-green-800 border-green-200';
 			case 'Cancelado':
-				return 'bg-red-100 text-red-800';
+				return 'bg-red-100 text-red-800 border-red-200';
 			default:
-				return 'bg-gray-100 text-gray-800';
+				return 'bg-gray-100 text-gray-800 border-gray-200';
 		}
 	}
 

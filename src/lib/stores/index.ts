@@ -18,6 +18,7 @@ export {
     initAuth,
     login,
     register,
+    verifyEmail,
     logout,
     checkAuth
 } from './auth.store';

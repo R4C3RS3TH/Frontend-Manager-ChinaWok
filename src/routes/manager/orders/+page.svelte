@@ -4,67 +4,171 @@
 	// Mock data for orders
 	let orders = [
 		{
-			id: '#CW-2024',
-			customer: 'Pedro Sanchez',
+			id: '#CW-2023',
+			customer: 'Juan Perez',
 			phone: '987654321',
 			address: 'Av. Larco 123, Miraflores',
 			items: [
-				{ name: 'Chaufa de Pollo', quantity: 2, price: 18.0 },
-				{ name: 'Sopa Wantan', quantity: 1, price: 12.0 }
+				{ name: 'Chijaukay', quantity: 2, price: 24.9 },
+				{ name: 'Arroz Chaufa de Pollo', quantity: 1, price: 19.9 }
 			],
-			total: 48.0,
-			status: 'Pendiente',
-			time: 'Hace 2 min',
-			paymentMethod: 'Yape'
-		},
-		{
-			id: '#CW-2023',
-			customer: 'Juan Perez',
-			phone: '912345678',
-			address: 'Jr. Union 456, Lima',
-			items: [
-				{ name: 'Chaufa de Pollo', quantity: 2, price: 18.0 },
-				{ name: 'Wantan Frito', quantity: 1, price: 10.0 }
-			],
-			total: 46.0,
+			total: 69.7,
 			status: 'Preparando',
 			time: 'Hace 5 min',
-			paymentMethod: 'Efectivo'
+			paymentMethod: 'Yape'
 		},
 		{
 			id: '#CW-2022',
 			customer: 'Maria Garcia',
-			phone: '998877665',
-			address: 'Calle Los Pinos 789, San Isidro',
+			phone: '912345678',
+			address: 'Jr. Unión 456, Lima',
 			items: [
-				{ name: 'Chi Jau Kay', quantity: 1, price: 24.0 },
-				{ name: 'Inka Kola 1.5L', quantity: 1, price: 8.0 }
+				{ name: 'Alitas BBQ x12', quantity: 3, price: 24.9 },
+				{ name: 'Tallarín Saltado con Pollo', quantity: 2, price: 21.9 }
 			],
-			total: 32.0,
-			status: 'Listo',
-			time: 'Hace 12 min',
-			paymentMethod: 'Tarjeta'
+			total: 118.5,
+			status: 'Preparando',
+			time: 'Hace 8 min',
+			paymentMethod: 'Efectivo'
 		},
 		{
 			id: '#CW-2021',
 			customer: 'Carlos Lopez',
-			phone: '955443322',
-			address: 'Av. Arequipa 1020, Lince',
-			items: [{ name: 'Chaufa de Pollo', quantity: 3, price: 18.0 }],
-			total: 54.0,
-			status: 'En camino',
-			time: 'Hace 25 min',
-			paymentMethod: 'Plin'
+			phone: '998877665',
+			address: 'Calle Los Pinos 789, San Isidro',
+			items: [
+				{ name: 'Tipakay', quantity: 2, price: 24.9 },
+				{ name: 'Tallarín Taypá', quantity: 2, price: 22.9 }
+			],
+			total: 95.6,
+			status: 'Preparando',
+			time: 'Hace 12 min',
+			paymentMethod: 'Tarjeta'
 		},
 		{
 			id: '#CW-2020',
 			customer: 'Ana Martinez',
+			phone: '955443322',
+			address: 'Av. Arequipa 1020, Lince',
+			items: [
+				{ name: 'Arroz Chaufa de Pollo', quantity: 4, price: 19.9 },
+				{ name: 'Alitas BBQ x6', quantity: 1, price: 26.9 }
+			],
+			total: 106.5,
+			status: 'Listo',
+			time: 'Hace 18 min',
+			paymentMethod: 'Plin'
+		},
+		{
+			id: '#CW-2019',
+			customer: 'Roberto Silva',
 			phone: '966778899',
 			address: 'Av. Javier Prado 2020, San Borja',
-			items: [{ name: 'Sopa Wantan', quantity: 2, price: 12.0 }],
-			total: 24.0,
+			items: [
+				{ name: 'Alitas BBQ x6', quantity: 3, price: 26.9 },
+				{ name: 'Chijaukay', quantity: 2, price: 24.9 }
+			],
+			total: 130.5,
+			status: 'Listo',
+			time: 'Hace 25 min',
+			paymentMethod: 'Yape'
+		},
+		{
+			id: '#CW-2018',
+			customer: 'Laura Gomez',
+			phone: '944556677',
+			address: 'Calle Las Flores 333, Surco',
+			items: [
+				{ name: 'Tallarín Saltado con Pollo', quantity: 2, price: 21.9 },
+				{ name: 'Tipakay', quantity: 2, price: 24.9 }
+			],
+			total: 93.6,
+			status: 'En camino',
+			time: 'Hace 35 min',
+			paymentMethod: 'Efectivo'
+		},
+		{
+			id: '#CW-2017',
+			customer: 'Diego Ramirez',
+			phone: '933221100',
+			address: 'Av. Benavides 555, Miraflores',
+			items: [
+				{ name: 'Arroz Chaufa de Pollo', quantity: 3, price: 19.9 },
+				{ name: 'Alitas BBQ x12', quantity: 2, price: 24.9 }
+			],
+			total: 109.5,
 			status: 'Entregado',
-			time: 'Hace 40 min',
+			time: 'Hace 42 min',
+			paymentMethod: 'Tarjeta'
+		},
+		{
+			id: '#CW-2016',
+			customer: 'Sofia Torres',
+			phone: '922334455',
+			address: 'Jr. Cusco 888, Cercado',
+			items: [
+				{ name: 'Tallarín Taypá', quantity: 3, price: 22.9 },
+				{ name: 'Chijaukay', quantity: 1, price: 24.9 }
+			],
+			total: 93.6,
+			status: 'Entregado',
+			time: 'Hace 55 min',
+			paymentMethod: 'Yape'
+		},
+		{
+			id: '#CW-2015',
+			customer: 'Miguel Vargas',
+			phone: '911223344',
+			address: 'Av. Colonial 999, Callao',
+			items: [
+				{ name: 'Chijaukay', quantity: 2, price: 24.9 },
+				{ name: 'Alitas BBQ x6', quantity: 3, price: 26.9 }
+			],
+			total: 130.5,
+			status: 'Entregado',
+			time: 'Hace 1 hora',
+			paymentMethod: 'Plin'
+		},
+		{
+			id: '#CW-2014',
+			customer: 'Patricia Flores',
+			phone: '900112233',
+			address: 'Calle Roma 444, San Miguel',
+			items: [
+				{ name: 'Tipakay', quantity: 2, price: 24.9 },
+				{ name: 'Arroz Chaufa de Pollo', quantity: 3, price: 19.9 }
+			],
+			total: 109.5,
+			status: 'Entregado',
+			time: 'Hace 1 hora',
+			paymentMethod: 'Efectivo'
+		},
+		{
+			id: '#CW-2013',
+			customer: 'Fernando Castro',
+			phone: '988776655',
+			address: 'Av. La Marina 777, Pueblo Libre',
+			items: [
+				{ name: 'Tallarín Saltado con Pollo', quantity: 4, price: 21.9 },
+				{ name: 'Alitas BBQ x12', quantity: 1, price: 24.9 }
+			],
+			total: 112.5,
+			status: 'Entregado',
+			time: 'Hace 1 hora',
+			paymentMethod: 'Tarjeta'
+		},
+		{
+			id: '#CW-2012',
+			customer: 'Claudia Mendez',
+			phone: '977665544',
+			address: 'Jr. Ancash 222, Breña',
+			items: [
+				{ name: 'Alitas BBQ x12', quantity: 2, price: 24.9 },
+				{ name: 'Tallarín Taypá', quantity: 1, price: 22.9 }
+			],
+			total: 72.7,
+			status: 'Cancelado',
+			time: 'Hace 1 hora',
 			paymentMethod: 'Yape'
 		}
 	];

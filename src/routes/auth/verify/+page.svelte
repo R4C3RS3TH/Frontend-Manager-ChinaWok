@@ -1,74 +1,52 @@
 <script lang="ts">
-	import { register, authLoading, authError } from '$lib/stores';
+	import { page } from '$app/stores';
+	import { verifyEmail, authLoading, authError } from '$lib/stores';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { getWebSocketService } from '$lib/stores';
 
-	let name = $state('');
 	let email = $state('');
-	let password = $state('');
-	let confirmPassword = $state('');
+	let code = $state('');
 	let validationError = $state('');
 	let successMessage = $state('');
 
-	let hasMinLength = $derived(password.length >= 8);
-	let hasUppercase = $derived(/[A-Z]/.test(password));
-	let hasLowercase = $derived(/[a-z]/.test(password));
-	let hasNumber = $derived(/[0-9]/.test(password));
-	let hasSpecial = $derived(/[\W_]/.test(password));
-
-	// Conectar WebSocket al montar
 	onMount(() => {
 		const ws = getWebSocketService();
 		ws.connect();
+
+		// Obtener email de la URL
+		const emailParam = $page.url.searchParams.get('email');
+		if (emailParam) {
+			email = emailParam;
+		} else {
+			// Si no hay email, redirigir a login
+			goto('/auth/login');
+		}
 	});
-
-	function validateForm(): boolean {
-		validationError = '';
-
-		if (!name || !email || !password || !confirmPassword) {
-			validationError = 'Por favor completa todos los campos';
-			return false;
-		}
-
-		if (!email.includes('@')) {
-			validationError = 'Por favor ingresa un correo válido';
-			return false;
-		}
-
-		if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password)) {
-			validationError =
-				'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial';
-			return false;
-		}
-
-		if (password !== confirmPassword) {
-			validationError = 'Las contraseñas no coinciden';
-			return false;
-		}
-
-		return true;
-	}
 
 	async function handleSubmit(e: Event) {
 		e.preventDefault();
+		validationError = '';
 		successMessage = '';
 
-		if (!validateForm()) return;
+		if (!code || code.length < 6) {
+			validationError = 'Por favor ingresa un código válido';
+			return;
+		}
 
-		const result = await register({ name, email, password, confirmPassword });
+		const result = await verifyEmail(email, code);
 
 		if (result.success) {
-			successMessage = 'Registro exitoso. Redirigiendo a verificación...';
+			successMessage = 'Verificación exitosa. Redirigiendo a login...';
 			setTimeout(() => {
-				goto(`/auth/verify?email=${encodeURIComponent(email)}`);
+				goto('/auth/login');
 			}, 2000);
 		}
 	}
 </script>
 
 <svelte:head>
-	<title>Registro - Manager ChinaWok</title>
+	<title>Verificar Email - Manager ChinaWok</title>
 </svelte:head>
 
 <div class="auth-container">
@@ -79,8 +57,8 @@
 					<img src="/chinawok.png" alt="ChinaWok Logo" class="logo-img" />
 				</div>
 			</div>
-			<h1 class="auth-title">Registro Manager</h1>
-			<p class="auth-subtitle">Crea tu cuenta de gestión</p>
+			<h1 class="auth-title">Verificar Email</h1>
+			<p class="auth-subtitle">Ingresa el código enviado a {email}</p>
 		</div>
 
 		<form onsubmit={handleSubmit} class="auth-form">
@@ -99,87 +77,25 @@
 			{/if}
 
 			<div class="form-group">
-				<label for="name" class="form-label"> Nombre Completo </label>
+				<label for="code" class="form-label"> Código de Verificación </label>
 				<input
-					id="name"
+					id="code"
 					type="text"
-					bind:value={name}
-					placeholder="Juan Pérez"
-					class="form-input"
+					bind:value={code}
+					placeholder="123456"
+					class="form-input code-input"
 					disabled={$authLoading}
 					required
-				/>
-			</div>
-
-			<div class="form-group">
-				<label for="email" class="form-label"> Correo Electrónico </label>
-				<input
-					id="email"
-					type="email"
-					bind:value={email}
-					placeholder="manager@chinawok.com"
-					class="form-input"
-					disabled={$authLoading}
-					required
-				/>
-			</div>
-
-			<div class="form-group">
-				<label for="password" class="form-label"> Contraseña </label>
-				<input
-					id="password"
-					type="password"
-					bind:value={password}
-					placeholder="Min. 8 caracteres, 1 mayúscula, 1 número"
-					class="form-input"
-					disabled={$authLoading}
-					required
-				/>
-				<div class="password-requirements">
-					<div class="requirement" class:valid={hasMinLength}>
-						<span class="check">{hasMinLength ? '✓' : '○'}</span>
-						<span>Mínimo 8 caracteres</span>
-					</div>
-					<div class="requirement" class:valid={hasUppercase}>
-						<span class="check">{hasUppercase ? '✓' : '○'}</span>
-						<span>Una mayúscula</span>
-					</div>
-					<div class="requirement" class:valid={hasLowercase}>
-						<span class="check">{hasLowercase ? '✓' : '○'}</span>
-						<span>Una minúscula</span>
-					</div>
-					<div class="requirement" class:valid={hasNumber}>
-						<span class="check">{hasNumber ? '✓' : '○'}</span>
-						<span>Un número</span>
-					</div>
-					<div class="requirement" class:valid={hasSpecial}>
-						<span class="check">{hasSpecial ? '✓' : '○'}</span>
-						<span>Un carácter especial</span>
-					</div>
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label for="confirmPassword" class="form-label"> Confirmar Contraseña </label>
-				<input
-					id="confirmPassword"
-					type="password"
-					bind:value={confirmPassword}
-					placeholder="Confirma tu contraseña"
-					class="form-input"
-					class:match={confirmPassword && password === confirmPassword}
-					class:nomatch={confirmPassword && password !== confirmPassword}
-					disabled={$authLoading}
-					required
+					maxlength="6"
 				/>
 			</div>
 
 			<button type="submit" class="submit-btn" disabled={$authLoading}>
 				{#if $authLoading}
 					<span class="loading-spinner"></span>
-					<span>Registrando...</span>
+					<span>Verificando...</span>
 				{:else}
-					<span>Crear Cuenta</span>
+					<span>Verificar</span>
 					<span class="btn-arrow">→</span>
 				{/if}
 			</button>
@@ -187,14 +103,15 @@
 
 		<div class="auth-footer">
 			<p class="footer-text">
-				¿Ya tienes cuenta?
-				<a href="/auth/login" class="footer-link">Inicia sesión aquí</a>
+				¿No recibiste el código?
+				<button class="resend-btn" disabled>Reenviar (Próximamente)</button>
 			</p>
 		</div>
 	</div>
 </div>
 
 <style>
+	/* Reutilizamos estilos de login/register */
 	.auth-container {
 		min-height: 100vh;
 		display: flex;
@@ -262,7 +179,7 @@
 			0 0 0 1px rgba(255, 255, 255, 0.1);
 		padding: 3rem;
 		width: 100%;
-		max-width: 500px;
+		max-width: 440px;
 		position: relative;
 		z-index: 1;
 		animation: slideUp 0.5s ease-out;
@@ -402,6 +319,7 @@
 
 	.error-icon {
 		font-size: 1.25rem;
+		font-weight: bold;
 	}
 
 	.form-group {
@@ -430,61 +348,23 @@
 		outline: none;
 	}
 
+	.code-input {
+		font-family: monospace;
+		font-size: 1.5rem;
+		letter-spacing: 0.5rem;
+		text-align: center;
+	}
+
 	.form-input:focus {
 		border-color: #00904a;
 		box-shadow: 0 0 0 3px rgba(0, 144, 74, 0.1);
 		transform: translateY(-2px);
 	}
 
-	.form-input.match {
-		border-color: #00904a;
-	}
-
-	.form-input.nomatch {
-		border-color: #f56565;
-	}
-
 	.form-input:disabled {
 		background: #f7fafc;
 		cursor: not-allowed;
 		opacity: 0.6;
-	}
-
-	.form-input::placeholder {
-		color: #cbd5e0;
-		font-size: 0.9rem;
-	}
-
-	.password-requirements {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		padding: 0.75rem;
-		background: #f7fafc;
-		border-radius: 8px;
-		font-size: 0.85rem;
-	}
-
-	.requirement {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		color: #718096;
-		transition: color 0.3s ease;
-	}
-
-	.requirement.valid {
-		color: #00904a;
-	}
-
-	.check {
-		font-weight: bold;
-		width: 20px;
-		text-align: center;
-	}
-
-	.requirement.valid .check {
-		color: #00904a;
 	}
 
 	.submit-btn {
@@ -574,49 +454,18 @@
 		margin: 0;
 	}
 
-	.footer-link {
+	.resend-btn {
+		background: none;
+		border: none;
 		color: #00904a;
 		font-weight: 600;
-		text-decoration: none;
-		transition: all 0.2s ease;
-		position: relative;
+		cursor: pointer;
+		padding: 0;
+		font-size: 0.9rem;
 	}
 
-	.footer-link::after {
-		content: '';
-		position: absolute;
-		bottom: -2px;
-		left: 0;
-		width: 0;
-		height: 2px;
-		background: #00904a;
-		transition: width 0.3s ease;
-	}
-
-	.footer-link:hover::after {
-		width: 100%;
-	}
-
-	.footer-link:hover {
-		color: #00703a;
-	}
-
-	@media (max-width: 640px) {
-		.auth-container {
-			padding: 1rem;
-		}
-
-		.auth-card {
-			padding: 2rem 1.5rem;
-		}
-
-		.auth-title {
-			font-size: 1.75rem;
-		}
-
-		.logo-circle {
-			width: 70px;
-			height: 70px;
-		}
+	.resend-btn:disabled {
+		color: #cbd5e0;
+		cursor: not-allowed;
 	}
 </style>

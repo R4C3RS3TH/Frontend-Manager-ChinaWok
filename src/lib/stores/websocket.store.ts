@@ -40,7 +40,7 @@ export function getWebSocketService(): WebSocketService {
             wsMessageCount.update((count) => count + 1);
 
             // Manejar notificaciones del backend
-            if (message.type === 'NOTIFICATION' && message.data) {
+            if (message.action === 'NOTIFICATION' && message.data) {
                 const payload = message.data as ClientPayload;
 
                 // 1. Manejar Acciones de UI

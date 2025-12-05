@@ -27,8 +27,9 @@
 			return false;
 		}
 
-		if (password.length < 6) {
-			validationError = 'La contraseña debe tener al menos 6 caracteres';
+		if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password)) {
+			validationError =
+				'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial';
 			return false;
 		}
 
